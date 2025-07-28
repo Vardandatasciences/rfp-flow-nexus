@@ -16,6 +16,31 @@ import Phase7Comparison from "./pages/workflow/Phase7Comparison";
 import Phase8Consensus from "./pages/workflow/Phase8Consensus";
 import Phase9Award from "./pages/workflow/Phase9Award";
 import Phase10Onboarding from "./pages/workflow/Phase10Onboarding";
+
+// Vendor Pages
+import VendorDatabase from "./pages/vendors/Database";
+import VendorPerformance from "./pages/vendors/Performance";
+import VendorOnboarding from "./pages/vendors/Onboarding";
+import VendorCategories from "./pages/vendors/Categories";
+
+// Evaluation Pages
+import PendingEvaluations from "./pages/evaluations/Pending";
+import CompletedEvaluations from "./pages/evaluations/Completed";
+import EvaluationConsensus from "./pages/evaluations/Consensus";
+import EvaluationComparisons from "./pages/evaluations/Comparisons";
+
+// Document Pages
+import RFPDocuments from "./pages/documents/RFPDocuments";
+import Proposals from "./pages/documents/Proposals";
+import Contracts from "./pages/documents/Contracts";
+import Templates from "./pages/documents/Templates";
+
+// Communication Pages
+import Notifications from "./pages/communications/Notifications";
+import EmailTemplates from "./pages/communications/EmailTemplates";
+import MessageHistory from "./pages/communications/MessageHistory";
+import BulkMessaging from "./pages/communications/BulkMessaging";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,14 +68,36 @@ const App = () => (
             <Route path="workflow/phase-9" element={<Phase9Award />} />
             <Route path="workflow/phase-10" element={<Phase10Onboarding />} />
             <Route path="workflow/phase-:phase" element={<RFPWorkflow />} />
-            <Route path="vendors" element={<Dashboard />} />
-            <Route path="vendors/*" element={<Dashboard />} />
-            <Route path="evaluations" element={<Dashboard />} />
-            <Route path="evaluations/*" element={<Dashboard />} />
-            <Route path="documents" element={<Dashboard />} />
-            <Route path="documents/*" element={<Dashboard />} />
-            <Route path="communications" element={<Dashboard />} />
-            <Route path="communications/*" element={<Dashboard />} />
+            
+            {/* Vendor Routes */}
+            <Route path="vendors" element={<VendorDatabase />} />
+            <Route path="vendors/database" element={<VendorDatabase />} />
+            <Route path="vendors/performance" element={<VendorPerformance />} />
+            <Route path="vendors/onboarding" element={<VendorOnboarding />} />
+            <Route path="vendors/categories" element={<VendorCategories />} />
+            
+            {/* Evaluation Routes */}
+            <Route path="evaluations" element={<PendingEvaluations />} />
+            <Route path="evaluations/pending" element={<PendingEvaluations />} />
+            <Route path="evaluations/completed" element={<CompletedEvaluations />} />
+            <Route path="evaluations/consensus" element={<EvaluationConsensus />} />
+            <Route path="evaluations/comparisons" element={<EvaluationComparisons />} />
+            
+            {/* Document Routes */}
+            <Route path="documents" element={<RFPDocuments />} />
+            <Route path="documents/rfp" element={<RFPDocuments />} />
+            <Route path="documents/proposals" element={<Proposals />} />
+            <Route path="documents/contracts" element={<Contracts />} />
+            <Route path="documents/templates" element={<Templates />} />
+            
+            {/* Communication Routes */}
+            <Route path="communications" element={<Notifications />} />
+            <Route path="communications/notifications" element={<Notifications />} />
+            <Route path="communications/templates" element={<EmailTemplates />} />
+            <Route path="communications/history" element={<MessageHistory />} />
+            <Route path="communications/bulk" element={<BulkMessaging />} />
+            
+            {/* Placeholder routes for Analytics, Admin, Help */}
             <Route path="analytics" element={<Dashboard />} />
             <Route path="analytics/*" element={<Dashboard />} />
             <Route path="admin" element={<Dashboard />} />

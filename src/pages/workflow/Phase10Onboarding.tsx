@@ -229,7 +229,7 @@ const Phase10Onboarding = () => {
                 <p><strong>Acceptance Date:</strong> {awardedVendor.acceptanceDate}</p>
                 <p><strong>Project Start:</strong> {awardedVendor.projectStartDate}</p>
                 <p><strong>Status:</strong> 
-                  <Badge className="status-badge awarded ml-2" size="sm">
+                  <Badge className="status-badge awarded ml-2">
                     {awardedVendor.status}
                   </Badge>
                 </p>

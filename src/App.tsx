@@ -15,13 +15,6 @@ import Phase6Evaluation from "./pages/workflow/Phase6Evaluation";
 import Phase7Comparison from "./pages/workflow/Phase7Comparison";
 import Phase8Consensus from "./pages/workflow/Phase8Consensus";
 import Phase9Award from "./pages/workflow/Phase9Award";
-import Phase10Onboarding from "./pages/workflow/Phase10Onboarding";
-
-// Vendor Pages
-import VendorDatabase from "./pages/vendors/Database";
-import VendorPerformance from "./pages/vendors/Performance";
-import VendorOnboarding from "./pages/vendors/Onboarding";
-import VendorCategories from "./pages/vendors/Categories";
 
 // Evaluation Pages
 import PendingEvaluations from "./pages/evaluations/Pending";
@@ -32,7 +25,7 @@ import EvaluationComparisons from "./pages/evaluations/Comparisons";
 // Document Pages
 import RFPDocuments from "./pages/documents/RFPDocuments";
 import Proposals from "./pages/documents/Proposals";
-import Contracts from "./pages/documents/Contracts";
+
 import Templates from "./pages/documents/Templates";
 
 // Communication Pages
@@ -66,15 +59,7 @@ const App = () => (
             <Route path="workflow/phase-7" element={<Phase7Comparison />} />
             <Route path="workflow/phase-8" element={<Phase8Consensus />} />
             <Route path="workflow/phase-9" element={<Phase9Award />} />
-            <Route path="workflow/phase-10" element={<Phase10Onboarding />} />
             <Route path="workflow/phase-:phase" element={<RFPWorkflow />} />
-            
-            {/* Vendor Routes */}
-            <Route path="vendors" element={<VendorDatabase />} />
-            <Route path="vendors/database" element={<VendorDatabase />} />
-            <Route path="vendors/performance" element={<VendorPerformance />} />
-            <Route path="vendors/onboarding" element={<VendorOnboarding />} />
-            <Route path="vendors/categories" element={<VendorCategories />} />
             
             {/* Evaluation Routes */}
             <Route path="evaluations" element={<PendingEvaluations />} />
@@ -87,7 +72,7 @@ const App = () => (
             <Route path="documents" element={<RFPDocuments />} />
             <Route path="documents/rfp" element={<RFPDocuments />} />
             <Route path="documents/proposals" element={<Proposals />} />
-            <Route path="documents/contracts" element={<Contracts />} />
+            
             <Route path="documents/templates" element={<Templates />} />
             
             {/* Communication Routes */}
@@ -96,10 +81,6 @@ const App = () => (
             <Route path="communications/templates" element={<EmailTemplates />} />
             <Route path="communications/history" element={<MessageHistory />} />
             <Route path="communications/bulk" element={<BulkMessaging />} />
-            
-            {/* Placeholder routes for Analytics, Admin, Help */}
-            <Route path="analytics" element={<Dashboard />} />
-            <Route path="analytics/*" element={<Dashboard />} />
             <Route path="admin" element={<Dashboard />} />
             <Route path="admin/*" element={<Dashboard />} />
             <Route path="help" element={<Dashboard />} />

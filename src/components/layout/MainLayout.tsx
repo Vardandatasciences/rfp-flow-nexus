@@ -60,18 +60,6 @@ const navigationSections = [
       { title: "Phase 7: Comparison", path: "/workflow/phase-7" },
       { title: "Phase 8: Consensus", path: "/workflow/phase-8" },
       { title: "Phase 9: Award", path: "/workflow/phase-9" },
-      { title: "Phase 10: Onboarding", path: "/workflow/phase-10" },
-    ],
-  },
-  {
-    title: "Vendors",
-    icon: Building2,
-    path: "/vendors",
-    items: [
-      { title: "Vendor Database", path: "/vendors" },
-      { title: "Performance", path: "/vendors/performance" },
-      { title: "Onboarding", path: "/vendors/onboarding" },
-      { title: "Categories", path: "/vendors/categories" },
     ],
   },
   {
@@ -92,7 +80,7 @@ const navigationSections = [
     items: [
       { title: "RFP Documents", path: "/documents" },
       { title: "Proposals", path: "/documents/proposals" },
-      { title: "Contracts", path: "/documents/contracts" },
+      
       { title: "Templates", path: "/documents/templates" },
     ],
   },
@@ -105,17 +93,6 @@ const navigationSections = [
       { title: "Email Templates", path: "/communications/templates" },
       { title: "Message History", path: "/communications/history" },
       { title: "Bulk Messaging", path: "/communications/bulk" },
-    ],
-  },
-  {
-    title: "Analytics",
-    icon: TrendingUp,
-    path: "/analytics",
-    items: [
-      { title: "Performance", path: "/analytics" },
-      { title: "Vendor Analysis", path: "/analytics/vendors" },
-      { title: "Process Analytics", path: "/analytics/process" },
-      { title: "Custom Reports", path: "/analytics/reports" },
     ],
   },
   {

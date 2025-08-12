@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Search, Plus, Copy, Edit, Download, Eye, Star, Clock, Users, BarChart3, Filter } from "lucide-react";
+import { Search, Plus, Copy, Edit, Download, Eye, Star, Clock, Users, BarChart3, Filter, FileText, Play } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import TemplateEditor from "@/components/templates/TemplateEditor";
+import TemplateSelector from "@/components/templates/TemplateSelector";
+import DraftManager from "@/components/templates/DraftManager";
 
 const templates = [
   {
@@ -111,6 +115,10 @@ const categories = [
 export default function Templates() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [showEditor, setShowEditor] = useState(false);
+  const [showDrafts, setShowDrafts] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("library");
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -128,6 +136,49 @@ export default function Templates() {
     return true;
   });
 
+  const handleCreateTemplate = () => {
+    setEditingTemplate(null);
+    setShowEditor(true);
+  };
+
+  const handleEditTemplate = (template: any) => {
+    setEditingTemplate(template);
+    setShowEditor(true);
+  };
+
+  const handleSaveTemplate = (templateData: any) => {
+    // Here you would save to your backend
+    console.log('Saving template:', templateData);
+    setShowEditor(false);
+    setEditingTemplate(null);
+  };
+
+  const handleRestoreDraft = (draft: any) => {
+    if (draft.type === 'template') {
+      setEditingTemplate(draft.data);
+      setShowEditor(true);
+    }
+    setShowDrafts(false);
+  };
+
+  const handleDeleteDraft = (draftId: string) => {
+    // Handle draft deletion
+    console.log('Deleting draft:', draftId);
+  };
+
+  if (showEditor) {
+    return (
+      <TemplateEditor
+        template={editingTemplate}
+        onSave={handleSaveTemplate}
+        onCancel={() => {
+          setShowEditor(false);
+          setEditingTemplate(null);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -137,19 +188,31 @@ export default function Templates() {
           <p className="text-muted-foreground">Manage and create RFP templates for efficient procurement</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowDrafts(true)}>
+            <FileText className="h-4 w-4 mr-2" />
+            View Drafts
+          </Button>
           <Button variant="outline">
             <BarChart3 className="h-4 w-4 mr-2" />
             Usage Analytics
           </Button>
-          <Button>
+          <Button onClick={handleCreateTemplate}>
             <Plus className="h-4 w-4 mr-2" />
             Create Template
           </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="library">Template Library</TabsTrigger>
+          <TabsTrigger value="drafts">Drafts & Auto-save</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="library" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-primary">36</div>
@@ -319,7 +382,12 @@ export default function Templates() {
                       <Copy className="h-4 w-4 mr-2" />
                       Use
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => handleEditTemplate(template)}
+                    >
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </Button>
@@ -330,6 +398,34 @@ export default function Templates() {
           </div>
         </div>
       </div>
+        </TabsContent>
+
+        <TabsContent value="drafts" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Drafts & Auto-save</h2>
+            <p className="text-muted-foreground mb-6">
+              Recover your work and continue where you left off
+            </p>
+            <DraftManager 
+              onRestoreDraft={handleRestoreDraft}
+              onDeleteDraft={handleDeleteDraft}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Drafts Dialog */}
+      <Dialog open={showDrafts} onOpenChange={setShowDrafts}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Your Drafts</DialogTitle>
+          </DialogHeader>
+          <DraftManager 
+            onRestoreDraft={handleRestoreDraft}
+            onDeleteDraft={handleDeleteDraft}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,12 @@ import {
   Settings,
   FileText,
   Lightbulb,
+  Clock,
+  CheckCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import TemplateSelector from "@/components/templates/TemplateSelector";
+import DraftManager from "@/components/templates/DraftManager";
 
 interface EvaluationCriteria {
   id: string;
@@ -34,6 +38,10 @@ interface EvaluationCriteria {
 
 const Phase1Creation = () => {
   const { toast } = useToast();
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [showDraftRecovery, setShowDraftRecovery] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -90,6 +98,88 @@ const Phase1Creation = () => {
 
   const totalWeight = criteria.reduce((sum, criterion) => sum + criterion.weight, 0);
 
+  // Auto-save functionality
+  useEffect(() => {
+    const autoSave = setInterval(() => {
+      if (formData.title.trim() || formData.description.trim()) {
+        setIsAutoSaving(true);
+        const draftData = {
+          ...formData,
+          criteria,
+          reviewers,
+          lastSaved: new Date().toISOString(),
+        };
+        localStorage.setItem('rfp_draft_current', JSON.stringify(draftData));
+        setLastSaved(new Date());
+        setTimeout(() => setIsAutoSaving(false), 1000);
+      }
+    }, 30000);
+
+    return () => clearInterval(autoSave);
+  }, [formData, criteria, reviewers]);
+
+  // Check for existing drafts on component mount
+  useEffect(() => {
+    const existingDraft = localStorage.getItem('rfp_draft_current');
+    if (existingDraft && !formData.title && !formData.description) {
+      setShowDraftRecovery(true);
+    }
+  }, []);
+
+  const loadTemplate = (template: any) => {
+    // Load template data into form
+    setFormData({
+      title: template.name + " - " + new Date().toLocaleDateString(),
+      description: template.description,
+      type: template.category.toLowerCase(),
+      category: template.category.toLowerCase(),
+      budgetMin: "",
+      budgetMax: "",
+      timeline: "",
+      deadline: "",
+    });
+
+    if (template.evaluationCriteria) {
+      setCriteria(template.evaluationCriteria.map((c: any, index: number) => ({
+        ...c,
+        id: (index + 1).toString(),
+      })));
+    }
+
+    toast({
+      title: "Template Loaded",
+      description: "Template has been loaded successfully. Customize as needed.",
+    });
+  };
+
+  const handleRestoreDraft = (draft: any) => {
+    const draftData = draft.data;
+    setFormData({
+      title: draftData.title || "",
+      description: draftData.description || "",
+      type: draftData.type || "",
+      category: draftData.category || "",
+      budgetMin: draftData.budgetMin || "",
+      budgetMax: draftData.budgetMax || "",
+      timeline: draftData.timeline || "",
+      deadline: draftData.deadline || "",
+    });
+
+    if (draftData.criteria) {
+      setCriteria(draftData.criteria);
+    }
+
+    if (draftData.reviewers) {
+      setReviewers(draftData.reviewers);
+    }
+
+    setShowDraftRecovery(false);
+    toast({
+      title: "Draft Restored",
+      description: "Your previous work has been restored.",
+    });
+  };
+
   const addCriterion = () => {
     const newCriterion: EvaluationCriteria = {
       id: Date.now().toString(),
@@ -142,11 +232,32 @@ const Phase1Creation = () => {
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline">Phase 1</Badge>
             <Progress value={10} className="w-32 h-2" />
+            {lastSaved && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                {isAutoSaving ? (
+                  <>
+                    <Clock className="h-3 w-3 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-3 w-3 text-success" />
+                    Saved {lastSaved.toLocaleTimeString()}
+                  </>
+                )}
+              </div>
+            )}
           </div>
           <h1 className="text-3xl font-bold tracking-tight">RFP Creation & Setup</h1>
           <p className="text-muted-foreground">
             Create a comprehensive RFP with evaluation criteria, budget, and reviewer assignments.
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowTemplateSelector(true)}>
+            <FileText className="h-4 w-4 mr-2" />
+            Use Template
+          </Button>
         </div>
       </div>
 
@@ -472,6 +583,45 @@ const Phase1Creation = () => {
           </Card>
         </div>
       </div>
+
+      {/* Template Selector */}
+      <TemplateSelector
+        isOpen={showTemplateSelector}
+        onClose={() => setShowTemplateSelector(false)}
+        onSelectTemplate={loadTemplate}
+        onStartFromScratch={() => setShowTemplateSelector(false)}
+      />
+
+      {/* Draft Recovery Dialog */}
+      {showDraftRecovery && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-2">Resume Previous Work?</h3>
+            <p className="text-muted-foreground mb-4">
+              We found an auto-saved draft from your previous session. Would you like to continue where you left off?
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  localStorage.removeItem('rfp_draft_current');
+                  setShowDraftRecovery(false);
+                }}
+              >
+                Start Fresh
+              </Button>
+              <Button
+                onClick={() => {
+                  const draftData = JSON.parse(localStorage.getItem('rfp_draft_current') || '{}');
+                  handleRestoreDraft({ data: draftData });
+                }}
+              >
+                Resume Draft
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

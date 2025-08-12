@@ -22,12 +22,15 @@ import {
   Eye,
   Save,
   Send,
+  Monitor,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SplitScreenEvaluator from "@/components/evaluation/SplitScreenEvaluator";
 
 const Phase6Evaluation = () => {
   const { toast } = useToast();
   const [activeProposal, setActiveProposal] = useState("1");
+  const [viewMode, setViewMode] = useState<"standard" | "split">("standard");
   const [scores, setScores] = useState({
     "1": { technical: 8.5, cost: 7.2, experience: 9.0, timeline: 8.0, support: 7.5 },
     "2": { technical: 7.8, cost: 8.5, experience: 8.2, timeline: 7.0, support: 8.0 },
@@ -213,285 +216,303 @@ const Phase6Evaluation = () => {
             Two evaluators per response with weighted scoring matrix.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span>{rfpData.evaluationsCompleted}/{rfpData.evaluationsTotal} evaluations completed</span>
-          <Progress value={(rfpData.evaluationsCompleted / rfpData.evaluationsTotal) * 100} className="w-20 h-2" />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant={viewMode === "standard" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("standard")}
+            >
+              Standard View
+            </Button>
+            <Button
+              variant={viewMode === "split" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("split")}
+            >
+              <Monitor className="h-4 w-4 mr-2" />
+              Split Screen
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <span>{rfpData.evaluationsCompleted}/{rfpData.evaluationsTotal} evaluations completed</span>
+            <Progress value={(rfpData.evaluationsCompleted / rfpData.evaluationsTotal) * 100} className="w-20 h-2" />
+          </div>
         </div>
       </div>
 
-      {/* RFP Overview */}
-      <Card className="phase-card">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <CardTitle>RFP Overview</CardTitle>
-            </div>
-            <Badge className="status-badge evaluation">Evaluation Phase</Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{rfpData.responses}</div>
-              <div className="text-sm text-muted-foreground">Vendor Responses</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{rfpData.value}</div>
-              <div className="text-sm text-muted-foreground">Budget</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{rfpData.evaluationsCompleted}</div>
-              <div className="text-sm text-muted-foreground">Completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{rfpData.deadline}</div>
-              <div className="text-sm text-muted-foreground">Deadline</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Vendor List */}
-        <Card className="phase-card">
-          <CardHeader>
-            <CardTitle>Vendor Proposals</CardTitle>
-            <CardDescription>Select a proposal to evaluate</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {vendorProposals.map((proposal) => (
-              <div
-                key={proposal.id}
-                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                  activeProposal === proposal.id ? "border-primary bg-primary/5" : "border-border hover:bg-accent"
-                }`}
-                onClick={() => setActiveProposal(proposal.id)}
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={proposal.vendor.logo} />
-                    <AvatarFallback>{proposal.vendor.name.substring(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">{proposal.vendor.name}</div>
-                    <div className="text-xs text-muted-foreground">{proposal.proposal.price}</div>
-                    <div className="flex gap-1 mt-1">
-                      {proposal.evaluations.map((evalItem, index) => (
-                        <div key={index} className="w-2 h-2 rounded-full bg-current opacity-20" 
-                             style={{ opacity: evalItem.status === "completed" ? 1 : 0.2 }} />
-                      ))}
-                    </div>
-                  </div>
+      {/* Conditional Rendering */}
+      {viewMode === "split" ? (
+        <SplitScreenEvaluator />
+      ) : (
+        <>
+          {/* RFP Overview */}
+          <Card className="phase-card">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <CardTitle>RFP Overview</CardTitle>
+                </div>
+                <Badge className="status-badge evaluation">Evaluation Phase</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{rfpData.responses}</div>
+                  <div className="text-sm text-muted-foreground">Vendor Responses</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{rfpData.value}</div>
+                  <div className="text-sm text-muted-foreground">Budget</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{rfpData.evaluationsCompleted}</div>
+                  <div className="text-sm text-muted-foreground">Completed</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{rfpData.deadline}</div>
+                  <div className="text-sm text-muted-foreground">Deadline</div>
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Main Evaluation Area */}
-        <div className="lg:col-span-3 space-y-6">
-          {currentProposal && (
-            <>
-              {/* Vendor Details */}
-              <Card className="phase-card">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={currentProposal.vendor.logo} />
-                        <AvatarFallback>{currentProposal.vendor.name.substring(0, 2)}</AvatarFallback>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Vendor List */}
+            <Card className="phase-card">
+              <CardHeader>
+                <CardTitle>Vendor Proposals</CardTitle>
+                <CardDescription>Select a proposal to evaluate</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {vendorProposals.map((proposal) => (
+                  <div
+                    key={proposal.id}
+                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                      activeProposal === proposal.id ? "border-primary bg-primary/5" : "border-border hover:bg-accent"
+                    }`}
+                    onClick={() => setActiveProposal(proposal.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={proposal.vendor.logo} />
+                        <AvatarFallback>{proposal.vendor.name.substring(0, 2)}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <CardTitle>{currentProposal.vendor.name}</CardTitle>
-                        <CardDescription>{currentProposal.vendor.location}</CardDescription>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{proposal.vendor.name}</div>
+                        <div className="text-xs text-muted-foreground">{proposal.proposal.price}</div>
+                        <div className="flex gap-1 mt-1">
+                          {proposal.evaluations.map((evalItem, index) => (
+                            <div key={index} className="w-2 h-2 rounded-full bg-current opacity-20" 
+                                 style={{ opacity: evalItem.status === "completed" ? 1 : 0.2 }} />
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Proposal
-                    </Button>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Price:</span>
-                      <div className="font-medium">{currentProposal.proposal.price}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Timeline:</span>
-                      <div className="font-medium">{currentProposal.proposal.timeline}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Employees:</span>
-                      <div className="font-medium">{currentProposal.vendor.employees}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Founded:</span>
-                      <div className="font-medium">{currentProposal.vendor.founded}</div>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <span className="text-sm text-muted-foreground">Key Features:</span>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {currentProposal.proposal.keyFeatures.map((feature, index) => (
-                        <Badge key={index} variant="outline">{feature}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                ))}
+              </CardContent>
+            </Card>
 
-              {/* Evaluation Tabs */}
-              <Tabs defaultValue="scoring" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="scoring">Scoring</TabsTrigger>
-                  <TabsTrigger value="evaluations">Other Evaluations</TabsTrigger>
-                  <TabsTrigger value="proposal">Proposal Details</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="scoring" className="space-y-6">
-                  {/* Current Evaluator */}
+            {/* Main Evaluation Area */}
+            <div className="lg:col-span-3 space-y-6">
+              {currentProposal && (
+                <>
+                  {/* Vendor Details */}
                   <Card className="phase-card">
                     <CardHeader>
-                      <CardTitle>Your Evaluation</CardTitle>
-                      <CardDescription>Score each criterion from 0-10</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {evaluationCriteria.map((criterion) => (
-                        <div key={criterion.id} className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Label className="font-medium">{criterion.name}</Label>
-                              <Badge variant="outline">{criterion.weight}%</Badge>
-                              {criterion.isVeto && (
-                                <Badge variant="destructive" className="text-xs">Veto</Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Input
-                                type="number"
-                                min="0"
-                                max="10"
-                                step="0.1"
-                                className="w-20 text-center"
-                                value={scores[activeProposal]?.[criterion.id] || ""}
-                                onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
-                              />
-                              <span className="text-sm text-muted-foreground">/ 10</span>
-                            </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={currentProposal.vendor.logo} />
+                            <AvatarFallback>{currentProposal.vendor.name.substring(0, 2)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <CardTitle>{currentProposal.vendor.name}</CardTitle>
+                            <CardDescription>{currentProposal.vendor.location}</CardDescription>
                           </div>
-                          <p className="text-sm text-muted-foreground">{criterion.description}</p>
                         </div>
-                      ))}
-                      
-                      <div className="pt-4 border-t">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">Weighted Score:</span>
-                          <span className="text-2xl font-bold text-primary">
-                            {calculateWeightedScore(scores[activeProposal] || {}).toFixed(1)} / 10
-                          </span>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Proposal
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Price:</span>
+                          <div className="font-medium">{currentProposal.proposal.price}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Timeline:</span>
+                          <div className="font-medium">{currentProposal.proposal.timeline}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Employees:</span>
+                          <div className="font-medium">{currentProposal.vendor.employees}</div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Founded:</span>
+                          <div className="font-medium">{currentProposal.vendor.founded}</div>
                         </div>
                       </div>
-
-                      <div className="space-y-2">
-                        <Label>Overall Comments</Label>
-                        <Textarea 
-                          placeholder="Provide your overall assessment and feedback..."
-                          rows={4}
-                        />
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button variant="outline" onClick={handleSaveEvaluation}>
-                          <Save className="h-4 w-4 mr-2" />
-                          Save Draft
-                        </Button>
-                        <Button onClick={handleSubmitEvaluation} className="gradient-primary">
-                          <Send className="h-4 w-4 mr-2" />
-                          Submit Evaluation
-                        </Button>
+                      <div className="mt-4">
+                        <span className="text-sm text-muted-foreground">Key Features:</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {currentProposal.proposal.keyFeatures.map((feature, index) => (
+                            <Badge key={index} variant="outline">{feature}</Badge>
+                          ))}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                </TabsContent>
 
-                <TabsContent value="evaluations" className="space-y-4">
-                  <Card className="phase-card">
-                    <CardHeader>
-                      <CardTitle>Evaluation Progress</CardTitle>
-                      <CardDescription>View other evaluators' progress</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {currentProposal.evaluations.map((evaluationItem, index) => (
-                        <div key={index} className="p-4 border border-border rounded-lg">
-                          <div className="flex items-center justify-between mb-3">
-                            <div>
-                              <div className="font-medium">{evaluationItem.evaluator}</div>
-                              <div className="text-sm text-muted-foreground">{evaluationItem.role}</div>
-                            </div>
-                            {getEvaluationStatusBadge(evaluationItem.status)}
-                          </div>
-                          {evaluationItem.status === "completed" && (
-                            <>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Star className="h-4 w-4 text-warning" />
-                                <span className="font-medium">Score: {evaluationItem.overallScore}/10</span>
-                                <span className="text-sm text-muted-foreground">
-                                  Completed: {evaluationItem.completedDate}
-                                </span>
-                              </div>
-                              {evaluationItem.comments && (
-                                <div className="bg-muted/50 p-3 rounded-lg text-sm">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <MessageSquare className="h-3 w-3" />
-                                    <span className="font-medium">Comments:</span>
-                                  </div>
-                                  {evaluationItem.comments}
+                  {/* Evaluation Tabs */}
+                  <Tabs defaultValue="scoring" className="space-y-4">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="scoring">Scoring</TabsTrigger>
+                      <TabsTrigger value="evaluations">Other Evaluations</TabsTrigger>
+                      <TabsTrigger value="proposal">Proposal Details</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="scoring" className="space-y-6">
+                      {/* Current Evaluator */}
+                      <Card className="phase-card">
+                        <CardHeader>
+                          <CardTitle>Your Evaluation</CardTitle>
+                          <CardDescription>Score each criterion from 0-10</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {evaluationCriteria.map((criterion) => (
+                            <div key={criterion.id} className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <Label className="font-medium">{criterion.name}</Label>
+                                  <Badge variant="outline">{criterion.weight}%</Badge>
+                                  {criterion.isVeto && (
+                                    <Badge variant="destructive" className="text-xs">Veto</Badge>
+                                  )}
                                 </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    max="10"
+                                    step="0.1"
+                                    className="w-20 text-center"
+                                    value={scores[activeProposal]?.[criterion.id] || ""}
+                                    onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
+                                  />
+                                  <span className="text-sm text-muted-foreground">/ 10</span>
+                                </div>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{criterion.description}</p>
+                            </div>
+                          ))}
+                          
+                          <div className="pt-4 border-t">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">Weighted Score:</span>
+                              <span className="text-2xl font-bold text-primary">
+                                {calculateWeightedScore(scores[activeProposal] || {}).toFixed(1)} / 10
+                              </span>
+                            </div>
+                          </div>
 
-                <TabsContent value="proposal" className="space-y-4">
-                  <Card className="phase-card">
-                    <CardHeader>
-                      <CardTitle>Proposal Details</CardTitle>
-                      <CardDescription>Detailed proposal information and documents</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <div>
-                            <span className="text-sm text-muted-foreground">Submitted:</span>
-                            <div className="font-medium">{currentProposal.proposal.submittedDate}</div>
+                          <div className="space-y-2">
+                            <Label>Overall Comments</Label>
+                            <Textarea 
+                              placeholder="Provide your overall assessment and feedback..."
+                              rows={4}
+                            />
                           </div>
-                          <div>
-                            <span className="text-sm text-muted-foreground">Document Size:</span>
-                            <div className="font-medium">{currentProposal.proposal.documentSize}</div>
+
+                          <div className="flex gap-2">
+                            <Button variant="outline" onClick={handleSaveEvaluation}>
+                              <Save className="h-4 w-4 mr-2" />
+                              Save Draft
+                            </Button>
+                            <Button onClick={handleSubmitEvaluation} className="gradient-primary">
+                              <Send className="h-4 w-4 mr-2" />
+                              Submit Evaluation
+                            </Button>
                           </div>
-                        </div>
-                      </div>
-                      <div className="pt-4">
-                        <Button variant="outline" className="w-full">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Full Proposal Document
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </>
-          )}
-        </div>
-      </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="evaluations" className="space-y-4">
+                      <Card className="phase-card">
+                        <CardHeader>
+                          <CardTitle>Evaluation Progress</CardTitle>
+                          <CardDescription>View other evaluators' progress</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {currentProposal.evaluations.map((evaluationItem, index) => (
+                            <div key={index} className="p-4 border border-border rounded-lg">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <div className="font-medium">{evaluationItem.evaluator}</div>
+                                  <div className="text-sm text-muted-foreground">{evaluationItem.role}</div>
+                                </div>
+                                {getEvaluationStatusBadge(evaluationItem.status)}
+                              </div>
+                              {evaluationItem.status === "completed" && (
+                                <>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Star className="h-4 w-4 text-warning" />
+                                    <span className="font-medium">Overall Score: {evaluationItem.overallScore}/10</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">{evaluationItem.comments}</p>
+                                  <div className="text-xs text-muted-foreground mt-2">
+                                    Completed on {evaluationItem.completedDate}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="proposal" className="space-y-4">
+                      <Card className="phase-card">
+                        <CardHeader>
+                          <CardTitle>Proposal Details</CardTitle>
+                          <CardDescription>Detailed proposal information and documents</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-3">
+                              <div>
+                                <span className="text-sm text-muted-foreground">Submitted:</span>
+                                <div className="font-medium">{currentProposal.proposal.submittedDate}</div>
+                              </div>
+                              <div>
+                                <span className="text-sm text-muted-foreground">Document Size:</span>
+                                <div className="font-medium">{currentProposal.proposal.documentSize}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="pt-4">
+                            <Button variant="outline" className="w-full">
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Full Proposal Document
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

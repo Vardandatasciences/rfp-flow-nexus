@@ -21,6 +21,7 @@ import PendingEvaluations from "./pages/evaluations/Pending";
 import CompletedEvaluations from "./pages/evaluations/Completed";
 import EvaluationConsensus from "./pages/evaluations/Consensus";
 import EvaluationComparisons from "./pages/evaluations/Comparisons";
+import CommitteeRanking from "./pages/evaluations/CommitteeRanking";
 
 // Document Pages
 import RFPDocuments from "./pages/documents/RFPDocuments";
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="evaluations/completed" element={<CompletedEvaluations />} />
             <Route path="evaluations/consensus" element={<EvaluationConsensus />} />
             <Route path="evaluations/comparisons" element={<EvaluationComparisons />} />
+            <Route path="evaluations/committee-ranking" element={<CommitteeRanking />} />
             
             {/* Document Routes */}
             <Route path="documents" element={<RFPDocuments />} />

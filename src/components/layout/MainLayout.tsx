@@ -71,6 +71,7 @@ const navigationSections = [
       { title: "Completed", path: "/evaluations/completed" },
       { title: "Consensus", path: "/evaluations/consensus" },
       { title: "Comparisons", path: "/evaluations/comparisons" },
+      { title: "Committee Ranking", path: "/evaluations/committee-ranking" },
     ],
   },
   {

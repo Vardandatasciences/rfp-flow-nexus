@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import TemplateEditor from "@/components/templates/TemplateEditor";
+import DocumentTemplateBuilder from "@/components/templates/DocumentTemplateBuilder";
+import VendorSubmissionInterface from "@/components/templates/VendorSubmissionInterface";
+import VersionControl from "@/components/templates/VersionControl";
 import TemplateSelector from "@/components/templates/TemplateSelector";
 import DraftManager from "@/components/templates/DraftManager";
 
@@ -116,6 +119,9 @@ export default function Templates() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showEditor, setShowEditor] = useState(false);
+  const [showDocumentBuilder, setShowDocumentBuilder] = useState(false);
+  const [showVendorInterface, setShowVendorInterface] = useState(false);
+  const [showVersionControl, setShowVersionControl] = useState(false);
   const [showDrafts, setShowDrafts] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("library");
@@ -138,19 +144,45 @@ export default function Templates() {
 
   const handleCreateTemplate = () => {
     setEditingTemplate(null);
+    setShowDocumentBuilder(true);
+  };
+
+  const handleCreateBasicTemplate = () => {
+    setEditingTemplate(null);
     setShowEditor(true);
   };
 
   const handleEditTemplate = (template: any) => {
     setEditingTemplate(template);
-    setShowEditor(true);
+    setShowDocumentBuilder(true);
+  };
+
+  const handleUseTemplate = (template: any) => {
+    setEditingTemplate(template);
+    setShowVendorInterface(true);
   };
 
   const handleSaveTemplate = (templateData: any) => {
     // Here you would save to your backend
     console.log('Saving template:', templateData);
     setShowEditor(false);
+    setShowDocumentBuilder(false);
     setEditingTemplate(null);
+  };
+
+  const handleSaveSubmission = (submissionData: any) => {
+    console.log('Saving submission:', submissionData);
+  };
+
+  const handleSubmitProposal = (submissionData: any) => {
+    console.log('Submitting proposal:', submissionData);
+    setShowVendorInterface(false);
+  };
+
+  const handleRestoreVersion = (version: any) => {
+    setEditingTemplate(version);
+    setShowDocumentBuilder(true);
+    setShowVersionControl(false);
   };
 
   const handleRestoreDraft = (draft: any) => {
@@ -179,6 +211,44 @@ export default function Templates() {
     );
   }
 
+  if (showDocumentBuilder) {
+    return (
+      <DocumentTemplateBuilder
+        template={editingTemplate}
+        onSave={handleSaveTemplate}
+        onCancel={() => {
+          setShowDocumentBuilder(false);
+          setEditingTemplate(null);
+        }}
+      />
+    );
+  }
+
+  if (showVendorInterface) {
+    return (
+      <VendorSubmissionInterface
+        template={editingTemplate}
+        onSave={handleSaveSubmission}
+        onSubmit={handleSubmitProposal}
+        onCancel={() => {
+          setShowVendorInterface(false);
+          setEditingTemplate(null);
+        }}
+      />
+    );
+  }
+
+  if (showVersionControl) {
+    return (
+      <VersionControl
+        templateId={editingTemplate?.id || 'new'}
+        onRestoreVersion={handleRestoreVersion}
+        onRestoreDraft={handleRestoreDraft}
+        onDeleteDraft={handleDeleteDraft}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -192,13 +262,21 @@ export default function Templates() {
             <FileText className="h-4 w-4 mr-2" />
             View Drafts
           </Button>
+          <Button variant="outline" onClick={() => setShowVersionControl(true)}>
+            <Clock className="h-4 w-4 mr-2" />
+            Version Control
+          </Button>
           <Button variant="outline">
             <BarChart3 className="h-4 w-4 mr-2" />
             Usage Analytics
           </Button>
+          <Button variant="outline" onClick={handleCreateBasicTemplate}>
+            <Plus className="h-4 w-4 mr-2" />
+            Basic Template
+          </Button>
           <Button onClick={handleCreateTemplate}>
             <Plus className="h-4 w-4 mr-2" />
-            Create Template
+            Document Template
           </Button>
         </div>
       </div>
@@ -378,8 +456,13 @@ export default function Templates() {
                       <Eye className="h-4 w-4 mr-2" />
                       Preview
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Copy className="h-4 w-4 mr-2" />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => handleUseTemplate(template)}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
                       Use
                     </Button>
                     <Button 

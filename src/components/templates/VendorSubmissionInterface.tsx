@@ -84,6 +84,8 @@ export default function VendorSubmissionInterface({
   };
 
   const calculateProgress = () => {
+    if (!template?.sections) return 0;
+    
     const totalFields = template.sections.reduce((total: number, section: any) => {
       return total + (section.fields?.filter((f: any) => f.required).length || 0);
     }, 0);
@@ -132,6 +134,8 @@ export default function VendorSubmissionInterface({
 
   const validateSubmission = () => {
     const errors: string[] = [];
+    
+    if (!template?.sections) return errors;
     
     template.sections.forEach((section: any) => {
       const sectionData = submissionData[section.id] || {};
@@ -386,7 +390,7 @@ export default function VendorSubmissionInterface({
 
         <Card>
           <CardContent className="p-8 space-y-8">
-            {template.sections.map((section: any, index: number) => (
+            {template?.sections?.map((section: any, index: number) => (
               <div key={section.id}>
                 {renderSection(section)}
                 {index < template.sections.length - 1 && <Separator className="my-8" />}
@@ -447,7 +451,7 @@ export default function VendorSubmissionInterface({
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2">
-              {template.sections.map((section: any, index: number) => {
+              {template?.sections?.map((section: any, index: number) => {
                 const status = getSectionStatus(section);
                 return (
                   <button
@@ -484,7 +488,7 @@ export default function VendorSubmissionInterface({
         <div className="flex-1">
           <ScrollArea className="h-full">
             <div className="p-8 max-w-4xl mx-auto">
-              {template.sections[currentSection] && (
+              {template?.sections?.[currentSection] && (
                 <div className="space-y-8">
                   {renderSection(template.sections[currentSection])}
                   
@@ -514,7 +518,7 @@ export default function VendorSubmissionInterface({
                         Save Draft
                       </Button>
                       
-                      {currentSection < template.sections.length - 1 ? (
+                      {currentSection < (template?.sections?.length || 0) - 1 ? (
                         <Button
                           onClick={() => setCurrentSection(currentSection + 1)}
                         >

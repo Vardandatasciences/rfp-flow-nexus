@@ -22,6 +22,7 @@ import CompletedEvaluations from "./pages/evaluations/Completed";
 import EvaluationConsensus from "./pages/evaluations/Consensus";
 import EvaluationComparisons from "./pages/evaluations/Comparisons";
 import CommitteeRanking from "./pages/evaluations/CommitteeRanking";
+import KPIs from "./pages/Dashboard/KPIs";
 
 // Document Pages
 import RFPDocuments from "./pages/documents/RFPDocuments";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard/kpis" element={<KPIs />} />
             <Route path="dashboard/*" element={<Dashboard />} />
             <Route path="workflow" element={<RFPWorkflow />} />
             <Route path="workflow/phase-1" element={<Phase1Creation />} />

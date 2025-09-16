@@ -40,6 +40,7 @@ const navigationSections = [
     path: "/dashboard",
     items: [
       { title: "Overview", path: "/dashboard" },
+      { title: "KPIs", path: "/dashboard/kpis" },
       { title: "My RFPs", path: "/dashboard/my-rfps" },
       { title: "Analytics", path: "/dashboard/analytics" },
       { title: "Reports", path: "/dashboard/reports" },
